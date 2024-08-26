@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import logging
+from robotsController import robotsModel
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -11,11 +12,11 @@ app = FastAPI()
 class Item(BaseModel):
     data: str
 
-@app.post("/process")
-async def process(item: Item):
-    # Log the data
-    logger.info(f"Received dataa: {item.data}")
-    return {"status": "success", "processed_data": item.data}
+@app.get("/step")
+async def step():
+    logger.info(f"Step: 1")
+    result = robotsModel()  # Call the function from logic.py
+    return {result}
 
 if __name__ == '__main__':
     import uvicorn
