@@ -213,7 +213,7 @@ class RobotAgent(ap.Agent):
 
     min_distance = float('inf')
     for box in self.model.boxes:
-      print(self.model.grid.positions[box])
+      #print(self.model.grid.positions[box])
       distance = heuristic(self.pos,self.model.grid.positions[box])
       if distance <= min_distance and box.has_been_picked == False :
         min_distance = distance
@@ -257,8 +257,8 @@ class RobotAgent(ap.Agent):
 
   def pick_up_box(self):
     self.has_box = True
-    print("BORRAMOS")
-    print(self.target)
+    #print("BORRAMOS")
+    #print(self.target)
     for agent in self.model.grid.agents:
       if self.model.grid.positions[agent] == self.pos and isinstance(agent, BoxAgent):
         self.model.grid.remove_agents(agent)
@@ -277,7 +277,7 @@ class RobotAgent(ap.Agent):
 
     min_distance = float('inf')
     for container in self.model.containers :
-      print(self.model.grid.positions[container])
+      #print(self.model.grid.positions[container])
       distance = heuristic(self.pos,self.model.grid.positions[container])
       if distance <= min_distance and container.capacity != 0 : #ADD IS FULL HERE
         min_distance = distance
@@ -417,10 +417,9 @@ class BoxAgent(ap.Agent):
     pass
 
   def end(self):
-    pass
+    pass  
 
 class ContainerAgent(ap.Agent):
-
   """
     <-- Funcion de Inicializacion -->
   """
@@ -451,11 +450,12 @@ class RobotModel(ap.Model):
     <-- Funcion de Inicializacion -->
   """
   def setup(self):
+    print("SUPA")
     self.steps = 0
-    self.robots = ap.AgentList(self,self.p.robots,RobotAgent)
-    self.boxes = ap.AgentList(self,self.p.boxes,BoxAgent)
-    self.containers = ap.AgentList(self,self.p.containers,ContainerAgent)
-    self.container_capacity = self.p.containers * 5
+    self.robots = ap.AgentList(self,len(self.p.robots),RobotAgent)
+    self.boxes = ap.AgentList(self,len(self.p.boxes),BoxAgent)
+    self.containers = ap.AgentList(self,len(self.p.containers),ContainerAgent)
+    self.container_capacity = len(self.p.containers) * 5
 
     #Instancia Grid
     self.grid = ap.Grid(self, (self.p.M, self.p.N), track_empty=True)
@@ -489,15 +489,6 @@ class RobotModel(ap.Model):
 
   def end(self):
     pass
-  
-parameters = {
-    'M': 10,
-    'N': 10,
-    'robots': 5,
-    'boxes': 18,
-    'containers': 3,
-    'steps': 100
-}
 
 def animation_plot(model, ax):
     """
@@ -521,6 +512,7 @@ def animation_plot(model, ax):
 
 #Create model
 #model = RobotModel(parameters)
+#model = None
 
 #Run with animation
 #If you want to run it without animation then use instead:
@@ -530,7 +522,25 @@ def animation_plot(model, ax):
 
 #Print the final animation
 #IPython.display.HTML(animation.to_jshtml())
-
-
-def robotsModel():
-    return "Hello"
+def robotsModel(parameters):
+    if parameters['begin']:
+        print("vivo")
+        global model
+        model = RobotModel(parameters)
+        model.setup()
+    else:
+      print("sigo vivo")
+    model.step()
+    robots = []
+    for robot in model.robots:
+      posy = int(robot.pos[0])
+      posx = int(robot.pos[1])
+      robots.append({robot.id: (posy,posx)})
+    containers = []
+    for container in model.containers:
+      containers.append({container.id: container.capacity})
+    boxes = []
+    for box in model.boxes:
+      boxes.append(box.id)
+    response = [{"robots": robots},{"containers": containers}, {"boxes": boxes}]
+    return response 
