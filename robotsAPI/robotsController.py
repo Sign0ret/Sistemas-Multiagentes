@@ -406,7 +406,7 @@ class BoxAgent(ap.Agent):
 
   def see(self, e):
     self.pos = e.positions[self]
-
+    #print(f"cajapos: {self.pos}")
   def next(self):
     pass
 
@@ -426,16 +426,19 @@ class ContainerAgent(ap.Agent):
   def setup(self):
     self.agentType = 2
     self.capacity = 100
-
+    self.pos = None
     pass
 
   def see(self, e):
+    self.pos = e.positions[self]
+    print(f"container pos: {self.pos}")
     pass
 
   def next(self):
     pass
 
   def step(self):
+    self.see(self.model.grid)
     pass
 
   def update(self):
@@ -462,8 +465,6 @@ class RobotModel(ap.Model):
     self.reservations = ap.Grid(self, (self.p.M, self.p.N), track_empty=True)
 
     #Asignacion de Agentes
-    print(f"Robots: {self.p.robots}")
-    print(f"Boxes: {self.p.boxes}")
     self.grid.add_agents(self.robots, positions=self.p.robots, empty=True)
     self.grid.add_agents(self.boxes, positions=self.p.boxes, empty=True)
     self.grid.add_agents(self.containers, positions=self.p.containers, empty=True)
@@ -472,6 +473,8 @@ class RobotModel(ap.Model):
   def step(self):
     print(f"Step: {self.steps}")
     self.robots.step()
+    self.boxes.step()
+    self.containers.step()
     """
     for i in range(len(self.robots)):
       for j in range(i + 1, len(self.robots)):
@@ -525,33 +528,29 @@ def animation_plot(model, ax):
 #Print the final animation
 #IPython.display.HTML(animation.to_jshtml())
 def robotsModel(parameters):
-    print(parameters['begin'] == 1)
     if parameters['begin'] == 1:
-        print("vivo") 
+        print("vivo")
         global model
         model = RobotModel(parameters)
         model.setup()
     else:
-        print("sigo vivo")
+      print("sigo vivo")
     model.step()
-    
     robots = []
     for robot in model.robots:
-        posy = int(robot.pos[0])
-        posx = int(robot.pos[1])
-        robots.append({"id": robot.id, "position": [posy, posx]})
-    
+      posy = int(robot.pos[0])
+      posx = int(robot.pos[1])
+      robots.append({"position": [posy, posx]})
     containers = []
     for container in model.containers:
-        containers.append({"id": container.id, "capacity": container.capacity})
-    
-    boxess = []
+      posy = int(container.pos[0])
+      posx = int(container.pos[1])
+      containers.append({"position": [posy, posx], "capacity": container.capacity})
+    boxes = []
     for box in model.boxes:
-        print(f"boxes: {box.pos}")
-        print(f"idsfsdfsdfsd: {box.id}")
-        print("aslkjdfalskdjf")
-        boxess.append(box.pos)
-    
-    response = {"robots": robots, "containers": containers, "boxes": boxess}
-    print(response)
-    return response
+      posy = int(box.pos[0])
+      posx = int(box.pos[1])
+      boxes.append({"position": [posy, posx]})
+      print(box.pos)
+    response = {"robots": robots,"containers": containers,"boxes": boxes}
+    return response 

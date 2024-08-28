@@ -18,7 +18,7 @@ class StepInput(BaseModel):
     robots: List[Tuple[int, int]]
     boxes: List[Tuple[int, int]]
     containers: List[Tuple[int, int]]
-    begin: bool
+    begin: int
 
 @app.post("/step")
 async def step(input_data: StepInput):
