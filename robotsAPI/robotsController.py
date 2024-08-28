@@ -425,7 +425,7 @@ class ContainerAgent(ap.Agent):
   """
   def setup(self):
     self.agentType = 2
-    self.capacity = 100
+    self.capacity = 5
     self.pos = None
     pass
 
